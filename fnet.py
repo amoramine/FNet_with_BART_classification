@@ -204,10 +204,10 @@ def main():
             total_samples += batch_size
             # print(total_samples)
             if i % 500 == 0:    # print every 2000 mini-batches
-                test_acc = evaluate(model, tokenizer, dataset['validation'])
+                valid_acc = evaluate(model, tokenizer, dataset['validation'])
                 print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1, running_loss / 2000))
                 running_loss = 0.0
-                print("test_acc: ", test_acc)
+                print("valid_acc: ", valid_acc)
                 print("train_acc : ", total_matches/total_samples)
     print('Finished Training')
 
