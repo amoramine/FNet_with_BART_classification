@@ -21,7 +21,7 @@ To run the project, clone the repo and run the following commands:
 ## Citation
 
 article{DBLP:journals/corr/abs-2105-03824,<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;  author    = {James Lee{-}Thorp and
+&nbsp;&nbsp;&nbsp;&nbsp;  author    = {James Lee-Thorp and
                Joshua Ainslie and
                Ilya Eckstein and
                Santiago  Ontañón},<br/>
