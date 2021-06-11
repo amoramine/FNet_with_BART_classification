@@ -1,4 +1,4 @@
-# FNet_classification
+# FNet_with_BART_classification
 
 ## Description
 
@@ -13,7 +13,7 @@ In other words, the model can be seen as BART's encoder with a Fourier Transform
 ## How to run the project
 
 To run the project, clone the repo and run the following commands: 
-1) `cd FNet_classification`
+1) `cd FNet_with_BART_classification`
 2) `pip install -r requirements.txt`
 3) `python fnet.py`
 
