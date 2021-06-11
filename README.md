@@ -19,3 +19,20 @@ To run the project, clone the repo and run the following commands:
 
 
 ## Citation
+
+article{DBLP:journals/corr/abs-2105-03824,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;  author    = {James Lee{-}Thorp and
+               Joshua Ainslie and
+               Ilya Eckstein and
+               Santiago Onta{\~{n}}{\'{o}}n},<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;  title     = {FNet: Mixing Tokens with Fourier Transforms},<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;  journal   = {CoRR},<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;  volume    = {abs/2105.03824},<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;  year      = {2021},<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;  url       = {https://arxiv.org/abs/2105.03824},<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;  archivePrefix = {arXiv},<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;  eprint    = {2105.03824},<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;  timestamp = {Fri, 14 May 2021 12:13:30 +0200},<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;  biburl    = {https://dblp.org/rec/journals/corr/abs-2105-03824.bib},<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;  bibsource = {dblp computer science bibliography, https://dblp.org}<br/>
+}
