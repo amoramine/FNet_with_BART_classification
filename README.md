@@ -24,7 +24,7 @@ article{DBLP:journals/corr/abs-2105-03824,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;  author    = {James Lee{-}Thorp and
                Joshua Ainslie and
                Ilya Eckstein and
-               Santiago Onta{\~{n}}{\'{o}}n},<br/>
+               Santiago  Ontañón},<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;  title     = {FNet: Mixing Tokens with Fourier Transforms},<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;  journal   = {CoRR},<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;  volume    = {abs/2105.03824},<br/>
