@@ -109,41 +109,29 @@ class FNet(nn.TransformerEncoder):
         x = m(x)
         return x
 
-def evaluate(model, tokenizer, dataset):
+
+def evaluate(model, tokenizer, dataset, device):
     total_matches = 0.0
     total_samples = 0.0
-    for i in range(dataset.num_rows):
-        data = dataset[i]
-        inputs = data['sentence']
-        labels = torch.FloatTensor([data['label']])
-        inputs = tokenizer(inputs, return_tensors='pt', padding='max_length', max_length=1024)
-        inputs = inputs['input_ids'].cuda()
-        labels = labels.cuda()
+    for data in dataset:
+        inputs = tokenizer(data['sentence'], return_tensors='pt', padding='max_length', max_length=1024)['input_ids'].to(device)
+        labels = torch.FloatTensor([data['label']]).to(device)
         outputs = model(inputs)
         outputs = outputs.reshape([outputs.shape[0]])
-
-        pred = [1 if e>0.5 else 0 for e in outputs]
-        pred = torch.FloatTensor(pred).cuda()
+        pred = torch.FloatTensor([1 if e>0.5 else 0 for e in outputs]).to(device)
         total_matches += sum(labels==pred)
         total_samples += 1
-
     acc = total_matches/total_samples
     return acc
-
-
-def main():
+    
+    
+def init_weights_with_BART(model, encoder_num_layers):
 
     bart_config = BartConfig()
     bart_classification_model = BartForSequenceClassification(bart_config)
-
-    FNet_num_layers = 6 
-
-    bart_classification_model.state_dict()['model.encoder.layers.0.fc1.weight']
-    model = FNet()
     sd = model.state_dict().copy()
-
-    for i in range(FNet_num_layers):
-        print(i)
+    
+    for i in range(encoder_num_layers):
         sd['layers.'+str(i)+'.fc1.weight'] = bart_classification_model.state_dict()['model.encoder.layers.'+str(i)+'.fc1.weight']
         sd['layers.'+str(i)+'.fc1.bias'] = bart_classification_model.state_dict()['model.encoder.layers.'+str(i)+'.fc1.bias']
         sd['layers.'+str(i)+'.fc2.weight'] = bart_classification_model.state_dict()['model.encoder.layers.'+str(i)+'.fc2.weight']
@@ -151,15 +139,26 @@ def main():
         sd['layers.'+str(i)+'.final_layer_norm.weight'] = bart_classification_model.state_dict()['model.encoder.layers.'+str(i)+'.final_layer_norm.weight']
         sd['layers.'+str(i)+'.final_layer_norm.bias'] = bart_classification_model.state_dict()['model.encoder.layers.'+str(i)+'.final_layer_norm.bias']
 
-
     model.load_state_dict(sd)
-    model = model.cuda()
-    model = torch.nn.DataParallel(model, device_ids=[0,1,2,3,4,5,6,7])
+    return model
 
+
+def main():
+
+    # to set the device dynamically
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print("device: ", device)
+    
+    encoder_num_layers = 1 # BART's original encoder has 6 layers
+    model = FNet(num_layers = encoder_num_layers)
+    model = init_weights_with_BART(model, encoder_num_layers).to(device)
+    
+#    uncomment this line if you can train the model on a cluster of GPUs and adapt the number of devices
+#    model = torch.nn.DataParallel(model, device_ids=[0,1,2,3,4,5,6,7])
 
     tokenizer = AutoTokenizer.from_pretrained("facebook/bart-base")
 
-    dataset = load_dataset('glue', 'sst2')
+    dataset = load_dataset('glue', 'sst2')        
 
     criterion = nn.BCELoss()
     optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
@@ -168,10 +167,10 @@ def main():
     trainloader = DataLoader(dataset['train'], batch_size=batch_size, shuffle=False)
 
     for epoch in range(100):  # loop over the dataset multiple times
-
         running_loss = 0.0
         total_matches = 0.0
         total_samples = 0.0
+        log_counter = 10
         for i, data in enumerate(trainloader, 0):
             # get the inputs; data is a list of [inputs, labels]
             inputs = data['sentence']
@@ -184,14 +183,14 @@ def main():
             # forward + backward + optimize
             inputs = tokenizer(inputs, return_tensors='pt', padding='max_length', max_length=1024)
             
-            inputs = inputs['input_ids'].cuda()
-            labels = labels.cuda()
+            inputs = inputs['input_ids'].to(device)
+            labels = labels.to(device)
 
             outputs = model(inputs)
             outputs = outputs.reshape([outputs.shape[0]])
 
             pred = [1 if e>0.5 else 0 for e in outputs]
-            pred = torch.FloatTensor(pred).cuda()
+            pred = torch.FloatTensor(pred).to(device)
 
             matches = sum(labels==pred)
             loss = criterion(outputs, labels)
@@ -202,10 +201,11 @@ def main():
             running_loss += loss.item()
             total_matches += matches
             total_samples += batch_size
-            # print(total_samples)
-            if i % 500 == 0:    # print every 2000 mini-batches
-                valid_acc = evaluate(model, tokenizer, dataset['validation'])
-                print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1, running_loss / 2000))
+            
+            if i % log_counter == 0:    # print every (log_counter * batch_size) mini-batches
+                valid_acc = evaluate(model, tokenizer, dataset['validation'], device)
+                num_mini_batches_passed = log_counter * batch_size
+                print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1, running_loss / num_mini_batches_passed))
                 running_loss = 0.0
                 print("valid_acc: ", valid_acc)
                 print("train_acc : ", total_matches/total_samples)
