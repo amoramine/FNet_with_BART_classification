@@ -6,7 +6,7 @@ FNet proposes to replace Transformers self-attention layers (having `O(n^2)` com
 
 This project leverages an existing implementation of FNet's encoder (https://github.com/jaketae/fnet.git) and completes the code to train the model on Stanford Sentiment Treebank (SST) dataset. SST is a dataset aimed for binary classification and is part of GLUE benchmark. 
 
-The original FNet model (from the paper) is pre-trained on masked language modelling (MLM) and next sentence prediction (NSP). However, the paper was only published  one month ago and the pre-trained model is not available online. In order to harness transfer learning and speed up the Fnet's convergence, the encoder's parameters are initialised using BartForSequenceClassification state_dict from HuggingFace. Additionally, BartTokenizer and BartLearnedPositionalEmbedding are used to process the input sequence before it is fed to the encoder. 
+The original FNet model (from the paper) is pre-trained on masked language modelling (MLM) and next sentence prediction (NSP). However, the paper was only published  one month ago and the pre-trained model is not available online. In order to harness transfer learning and speed up the FNet's convergence, this project initialises FNet's encoder with BartForSequenceClassification parameters (loaded from HuggingFace). Additionally, BartTokenizer and BartLearnedPositionalEmbedding are used to process the input sequence before it is fed to the encoder. 
 
 Overall, the model can be seen as BART's encoder with a Fourier Transform token mixing mechanism instead of self-attention.
 
